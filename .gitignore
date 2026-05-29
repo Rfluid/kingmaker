@@ -1,0 +1,14 @@
+samples/**
+!samples/.gitkeep
+
+recordings/
+*.wav
+*.aif
+*.aiff
+*.flac
+
+dist-newstyle/
+dist/
+.ghc.environment.*
+
+.DS_Store
