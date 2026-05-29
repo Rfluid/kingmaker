@@ -1,0 +1,6 @@
+-- Blue Monday - New Order
+
+-- Tempo: 128 BPM
+setcps(128/60)
+
+d1 $ sound "harpy"

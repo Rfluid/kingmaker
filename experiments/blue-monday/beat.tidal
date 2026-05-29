@@ -1,0 +1,38 @@
+-- Blue Monday - New Order
+--
+-- 6 slow 
+-- 8 fast
+--
+-- 2 whole, 4 quarter, 4 whole
+
+-- Tempo: 128 BPM
+setcps(128/60)
+
+-- 6 first beats are whole notes
+d1 $ sound "bd"
+
+-- 8 next beats are quarter
+d1 $ sound "bd*4"
+
+-- whenmod a b f: counts cycles and applies f when (cycle `mod` a) >= b.
+-- Here, over each span of 8 cycles, the pattern plays plain "bd" for the
+-- first 6 cycles (0..5), then applies (fast 4) on cycles 6 and 7 — i.e.
+-- 6 whole notes followed by 2 cycles of quarter notes. This gets the right
+-- counts but the wrong order: the fast section lands at the END of the span,
+-- not the middle like the original song.
+d1 $ whenmod 8 6 (fast 4) $ sound "bd"
+
+-- slowcat plays one list element per cycle, in order, looping every 8 cycles.
+-- This lets us place the sections exactly where the song wants them:
+-- 2 whole notes, then 2 cycles of quarter notes, then 4 whole notes —
+-- fixing the ordering that whenmod couldn't express.
+d1 $ slowcat [ sound "bd" -- whole
+    , sound "bd"          -- whole
+    , fast 4 $ sound "bd" -- q q q q
+    , fast 4 $ sound "bd" -- q q q q
+    , sound "bd"          -- whole
+    , sound "bd"          -- whole
+    , sound "bd"          -- whole
+    , sound "bd"          -- whole
+]
+
