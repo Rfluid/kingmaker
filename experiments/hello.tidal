@@ -1,0 +1,12 @@
+-- Open in nvim, place cursor on a line, press <S-CR>.
+-- Press <leader><Esc> to hush.
+
+d1 $ sound "bd sn bd sn"
+
+d2 $ sound "hh*8" # gain 0.6
+
+d1 $ slow 2 $ sound "bd [~ cp] bd cp"
+  # speed (range 0.8 1.2 $ slow 4 sine)
+
+-- Stop one orbit:
+-- d1 silence
