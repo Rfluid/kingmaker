@@ -1,0 +1,121 @@
+-- ============================================================
+-- LESSON 01 — your first beat
+-- ============================================================
+-- HOW TO USE THIS FILE:
+--   Put your cursor on a line and press  <S-CR>  (Shift+Enter) to run it.
+--   Whatever you run keeps looping until you change it or stop it.
+--   Panic button:  <leader><Esc>  = hush everything.
+--
+-- Work top to bottom. Run a line, listen, then run the NEXT version
+-- of the same line. Each `d1 $ ...` REPLACES the previous d1.
+-- ============================================================
+
+
+-- ------------------------------------------------------------
+-- 1. Make a sound
+-- ------------------------------------------------------------
+-- `d1` is a channel (think: a track/slot, d1..d16).
+-- `sound "..."` picks samples by name. Each word = one hit.
+-- The quoted string is split evenly across ONE cycle (~one bar).
+
+d1 $ sound "bd"
+-- ^ one kick per cycle. Boring but alive. Run it.
+
+d1 $ sound "bd bd bd bd"
+-- ^ four kicks, evenly spaced = four-on-the-floor. Same d1, replaced.
+
+-- Sample names you have out of the box:
+--   bd = kick, sn = snare, hh = hi-hat, cp = clap, arpy = a synth pluck
+-- A name can have a number to pick a variant:  "bd:3"  (the 4th bd sample)
+
+-- Test
+d1 $ sound "bd sn bd sn"
+d1 $ sound "bd hh cp hh"
+d1 $ sound "bd a cp hh"
+d1 $ sound "bd hh cp hh:2"
+
+-- ------------------------------------------------------------
+-- 2. The mini-notation (the magic inside the quotes)
+-- ------------------------------------------------------------
+d1 $ sound "bd sn bd sn"          -- kick snare kick snare
+d1 $ sound "bd ~ sn ~"            -- ~ is a REST (silence)
+d1 $ sound "bd*2 sn"              -- *2 = play twice as fast in its slot
+d1 $ sound "bd [sn sn]"           -- [..] groups: the pair shares one slot
+d1 $ sound "bd sn . hh hh hh"     -- . splits the bar into uneven groups
+d1 $ sound "bd <sn cp>"           -- <..> picks ONE per cycle, alternating
+d1 $ sound "bd hh*8"              -- 1 kick + 8 hats packed into its half
+
+-- Test
+d1 $ sound "bd [sn bd]"
+d1 $ sound "bd bd sn"
+
+-- ------------------------------------------------------------
+-- 3. Add a second layer
+-- ------------------------------------------------------------
+-- Different channels play at the same time. Run BOTH of these:
+
+d1 $ sound "bd ~ bd ~"
+d2 $ sound "hh*8" # gain 0.7
+-- ^ `# gain 0.7` makes d2 quieter (1 = full, ~0.6-0.8 for hats).
+--   `#` attaches a parameter to the pattern.
+
+-- Stop just one channel:
+d2 silence
+-- (run that ^ to drop the hats; d1 keeps going)
+
+
+-- ------------------------------------------------------------
+-- 4. Transform patterns with functions
+-- ------------------------------------------------------------
+-- Functions wrap a pattern and change it. `$` means "apply to the rest
+-- of the line". Read `slow 2 $ sound "..."` as: slow-down(the sound).
+
+d1 $ slow 2 $ sound "bd sn bd sn"   -- half speed (stretches over 2 cycles)
+d1 $ fast 2 $ sound "bd sn"         -- double speed
+d1 $ rev $ sound "bd sn cp hh"      -- play the cycle backwards
+
+-- `every n f` applies f only every n-th cycle — instant variation:
+d1 $ every 4 (fast 2) $ sound "bd sn bd sn"
+-- ^ normal for 3 cycles, then a double-time bar on the 4th. Listen for it.
+
+-- `jux f` = do the pattern normally in one ear, f-transformed in the other:
+d1 $ jux rev $ sound "arpy arpy:2 arpy:4 arpy:6"
+-- ^ forwards in the left ear, reversed in the right. Wide stereo.
+
+
+-- ------------------------------------------------------------
+-- 5. Pitch — notes and synths
+-- ------------------------------------------------------------
+-- `n` chooses which sample variant OR which note for a synth.
+d1 $ n "0 2 4 7" # sound "arpy"        -- a little melody from arpy samples
+
+-- `note` + a real synth (SuperDirt ships "superpiano", "supersaw", etc.):
+d1 $ note "c e g c6" # sound "superpiano"
+d1 $ note "0 3 5 7" # sound "supersaw" # gain 0.7
+
+
+-- ------------------------------------------------------------
+-- 6. Put it together — a tiny groove
+-- ------------------------------------------------------------
+-- Run these three. They layer into a beat:
+d1 $ sound "bd ~ bd [~ bd]"
+d2 $ sound "~ cp ~ cp" # gain 0.9
+d3 $ sound "hh*8" # gain (range 0.5 0.8 $ slow 4 sine)
+-- ^ that `range ... sine` makes the hat volume breathe up and down slowly.
+
+-- Now mutate d1 live while it plays — run any of these over the top:
+d1 $ every 2 (fast 2) $ sound "bd ~ bd [~ bd]"
+d1 $ sound "bd ~ bd [~ bd]" # speed "1 1 1 1.5"
+
+
+-- ------------------------------------------------------------
+-- 7. Stopping
+-- ------------------------------------------------------------
+d3 silence        -- stop one channel
+hush              -- stop EVERYTHING (or just press <leader><Esc>)
+
+
+-- ============================================================
+-- NEXT: copy a line you like into a new file in experiments/
+-- and start changing numbers. That's the whole game.
+-- ============================================================
