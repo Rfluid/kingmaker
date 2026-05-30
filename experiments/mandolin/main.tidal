@@ -1,0 +1,15 @@
+setcps (80/60/2)   -- a calm 80 BPM to audition things
+
+
+-- base
+d1 $ sound "[~ bd] [~ bd*2] [~ bd]"
+
+-- initial manadolin melody
+d2 $ slowcat [
+note "c e [g b]" # sound "supermandolin"
+, note "c e [g b]" # sound "supermandolin"
+, note "c e [g b]" # sound "supermandolin"
+, note "c e [g b]" # sound "supermandolin"
+, note "b4 e [g b]" # sound "supermandolin"
+, note "a4 e [g b]" # sound "supermandolin"
+]
