@@ -1,0 +1,137 @@
+-- ============================================================
+-- LESSON 02 — note durations (whole, half, quarter, ...)
+-- ============================================================
+-- HOW TO USE THIS FILE:
+--   Put your cursor on a line and press  <S-CR>  (Shift+Enter) to run it.
+--   Whatever you run keeps looping until you change it or stop it.
+--   Panic button:  <leader><Esc>  = hush everything.
+--
+-- Work top to bottom. Run a line, listen, then run the NEXT version.
+-- Each `d1 $ ...` REPLACES the previous d1.
+-- ============================================================
+
+
+-- ------------------------------------------------------------
+-- 0. The big idea: ONE CYCLE = ONE WHOLE NOTE
+-- ------------------------------------------------------------
+-- In Tidal a "cycle" is the loop. Think of it as one bar of 4/4.
+-- That whole bar is your WHOLE NOTE. Everything else is the bar
+-- cut into equal pieces:
+--
+--   whole note    = 1 hit  per cycle   (the whole bar)
+--   half note     = 2 hits per cycle
+--   quarter note  = 4 hits per cycle   <- the steady "1 2 3 4" pulse
+--   eighth note   = 8 hits per cycle
+--   sixteenth     = 16 hits per cycle
+--
+-- The number of evenly-spaced words in the quotes = how you slice it.
+
+
+-- ------------------------------------------------------------
+-- 1. Hear each duration
+-- ------------------------------------------------------------
+d1 $ sound "bd"                       -- WHOLE note: 1 kick fills the bar
+d1 $ sound "bd bd"                    -- HALF notes: 2 kicks
+d1 $ sound "bd bd bd bd"              -- QUARTER notes: the 4/4 pulse
+d1 $ sound "bd bd bd bd bd bd bd bd"  -- EIGHTH notes: 8 kicks
+
+-- Same thing, but using `*` to pack repeats into one slot.
+-- `bd*4` means "4 hits where 1 would go" — read it as the note value:
+d1 $ sound "bd*1"     -- whole
+d1 $ sound "bd*2"     -- half
+d1 $ sound "bd*4"     -- quarter
+d1 $ sound "bd*8"     -- eighth
+d1 $ sound "bd*16"    -- sixteenth (a buzzy roll)
+
+
+-- ------------------------------------------------------------
+-- 2. Counting "1 2 3 4" — quarter notes are the reference
+-- ------------------------------------------------------------
+-- Put a hat on every quarter so you can FEEL the count, then
+-- layer faster/slower notes against it.
+
+d1 $ sound "hh hh hh hh"              -- 4 quarter-note hats = "1 2 3 4"
+
+-- Now a kick on beats 1 and 3 (half-note feel) under the quarters:
+d1 $ sound "hh hh hh hh"
+d2 $ sound "bd ~ bd ~"                -- bd lands on 1 and 3
+
+-- And a whole-note pad-ish hit on beat 1 only:
+d3 $ sound "~ ~ ~ ~" # gain 0  -- (placeholder, replace below)
+d3 $ note "c4" # sound "superpiano"   -- 1 long note per bar = whole note
+
+
+-- ------------------------------------------------------------
+-- 3. Mixing durations in ONE pattern
+-- ------------------------------------------------------------
+-- Each top-level word gets an EQUAL slice. Use [..] to subdivide a
+-- slice into shorter notes — that's how you write eighths/sixteenths
+-- next to quarters.
+
+d1 $ sound "bd bd bd bd"              -- four quarters
+d1 $ sound "bd bd [bd bd] bd"         -- beat 3 split into two eighths
+d1 $ sound "bd [bd bd] [bd bd bd bd] bd"  -- quarter, 2x eighth, 4x sixteenth, quarter
+
+-- Dotted feel / uneven slices with `.`  (groups need not be equal length):
+d1 $ sound "bd bd . bd"               -- first half = two hits, second half = one
+
+
+-- ------------------------------------------------------------
+-- 4. Rests are durations too
+-- ------------------------------------------------------------
+-- `~` is a rest. A quarter rest just means "skip that quarter".
+d1 $ sound "bd ~ bd ~"                -- kick, quarter rest, kick, quarter rest
+d1 $ sound "bd ~ ~ bd"                -- kick, half-note worth of rest, kick
+d1 $ sound "~ bd ~ bd"                -- off-beat kicks (the "and" of 2 and 4)
+
+
+-- ------------------------------------------------------------
+-- 5. Tying it to pitched notes
+-- ------------------------------------------------------------
+-- Durations work the same for melodies. A scale, one note per quarter:
+d1 $ note "c d e f" # sound "superpiano"          -- four quarter notes
+d1 $ note "c d e f g a b c6" # sound "superpiano"  -- eight eighth notes (a run)
+
+-- One long whole note vs. a busy bar — same pitch, different rhythm:
+d1 $ note "c" # sound "superpiano"                 -- whole note
+d1 $ note "c*8" # sound "superpiano"               -- same note, eighth-note repeats
+
+
+-- ------------------------------------------------------------
+-- 6. Tempo — how long a "quarter" actually lasts
+-- ------------------------------------------------------------
+-- `setcps` sets cycles-per-second. 1 cycle = 1 bar of 4 beats.
+-- A handy rule: cps = BPM / 60 / 4   (BPM = beats/quarters per minute)
+
+setcps (120/60/4)    -- 120 BPM: a comfortable, common tempo
+d1 $ sound "bd bd bd bd"   -- now these quarter notes = 120 BPM
+
+setcps (90/60/4)     -- slower
+setcps (140/60/4)    -- faster
+
+
+-- ------------------------------------------------------------
+-- 7. Put it together — a counted groove
+-- ------------------------------------------------------------
+setcps (110/60/4)
+d1 $ sound "bd ~ bd ~"                       -- half-ish kick (1 and 3)
+d2 $ sound "~ sn ~ sn"                       -- snare on 2 and 4 (backbeat)
+d3 $ sound "hh*8" # gain 0.7                 -- eighth-note hats
+d4 $ note "c e g e" # sound "superpiano"     -- quarter-note melody on top
+
+
+-- ------------------------------------------------------------
+-- 8. Stopping
+-- ------------------------------------------------------------
+d4 silence        -- stop one channel
+hush              -- stop EVERYTHING (or just press <leader><Esc>)
+
+
+-- ============================================================
+-- RECAP:
+--   1 cycle = 1 whole note = 1 bar.
+--   words in quotes split the bar evenly: 2=half, 4=quarter, 8=eighth.
+--   `bd*4` packs that many into one slot; `[..]` subdivides one slot.
+--   `~` is a rest; `setcps (BPM/60/4)` sets how fast it all goes.
+-- NEXT: take the groove in part 7 and change every duration once.
+-- ============================================================
