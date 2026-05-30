@@ -1,0 +1,25 @@
+-- Notification for terminal processes end
+-- Futuristic deep sound
+
+-- Synths:  
+-- "supersaw"       -- buzzy saw, big + warm
+-- "superreese"     -- deep detuned bass growl
+
+-- Tone: e major
+
+-- Bass: superreese
+-- Pad: buzzy saw a little darker
+
+-- Bass holding the root note
+-- Pad with two chords and a transition note: 
+-- third (iii) and seventh (vi) with fifth in the middle
+
+setcps (180/60/2)   -- a calm 120 BPM to audition things
+
+let bass = note "e2" # sound "superreese"
+let pad = note "[gs'min b] cs'min" # sound "supersaw" 
+
+once $ stack [
+    pad # attack 0.4  # release 1.5 # cutoff 400
+    , bass # gain 0.7 # cutoff 400
+]
