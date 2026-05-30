@@ -1,0 +1,112 @@
+-- ============================================================
+-- SYNTHS — SuperDirt's built-in synthesizers
+-- ============================================================
+-- These are NOT samples. They're real oscillators living in
+-- SuperCollider, so `note`/`n` actually changes the PITCH, and
+-- they respond to envelope + filter knobs you'll meet below.
+--
+-- Same rules as lesson-01: cursor on a line, <S-CR> to run,
+-- each `d1 $ ...` replaces the last. `hush` stops everything.
+--
+-- `note "..."` takes note names (c d e f g a b, add # or s for
+-- sharp, f for flat) OR numbers (0 = c5). c6 is an octave up.
+-- ============================================================
+
+setcps (120/60/2)   -- a calm 120 BPM to audition things
+
+
+-- ------------------------------------------------------------
+-- 1. The synths, one at a time — run each and listen
+-- ------------------------------------------------------------
+-- Play the SAME little phrase through each so you hear the timbre,
+-- not the notes. Swap the sound name, keep the rest.
+
+d1 $ note "c e g b" # sound "superpiano"     -- clean tuned piano
+d1 $ note "c e g b" # sound "supersaw"       -- buzzy saw, big + warm
+d1 $ note "c e g b" # sound "supersquare"    -- hollow, woody square wave
+d1 $ note "c e g b" # sound "superpwm"       -- thick, detuned, classic pad
+d1 $ note "c e g b" # sound "superhammond"   -- organ, drawbar-ish
+d1 $ note "c e g b" # sound "superhoover"    -- the rave "hoover" — aggressive
+d1 $ note "c e g b" # sound "superreese"     -- deep detuned bass growl
+d1 $ note "c e g b" # sound "superchip"      -- 8-bit chiptune blip
+d1 $ note "c e g b" # sound "superfork"      -- bell / tuning-fork tone
+d1 $ note "c e g b" # sound "supermandolin"  -- plucked string
+d1 $ note "c e g b" # sound "supergong"      -- metallic struck gong
+
+-- Non-pitched texture generators (note doesn't matter much):
+d1 $ sound "supernoise"                      -- filtered noise — risers/fx
+d1 $ sound "superhat"                        -- synthesised hi-hat
+d1 $ sound "superzow"                        -- harsh digital zap
+
+
+-- ------------------------------------------------------------
+-- 2. Shape the sound — the four knobs you'll always reach for
+-- ------------------------------------------------------------
+-- Run these on top of each other to feel each one.
+
+-- ATTACK / RELEASE: how fast it fades in / out (seconds).
+d1 $ note "c e g b" # sound "supersaw" # attack 0.01 # release 0.2   -- plucky
+d1 $ note "c e g b" # sound "supersaw" # attack 0.4  # release 1.5   -- pad/swell
+
+-- CUTOFF: low-pass filter. Low number = dark/muffled, high = bright.
+d1 $ note "c e g b" # sound "supersaw" # cutoff 400
+d1 $ note "c e g b" # sound "supersaw" # cutoff 4000
+
+-- A moving cutoff is the whole secret to synths sounding alive:
+d1 $ note "c e g b" # sound "supersaw" # cutoff (range 300 3000 $ slow 4 sine)
+-- ^ the filter sweeps open and closed over 4 cycles. This is "the riser".
+
+
+-- ------------------------------------------------------------
+-- 3. A bassline (this is what supersaw / superreese are FOR)
+-- ------------------------------------------------------------
+-- Low octave (c2), short notes, a touch of filter movement.
+d1 $ note "c2 c2 ds2 g2" # sound "superreese"
+       # cutoff (range 200 1200 $ slow 8 sine)
+       # gain 0.9
+
+-- Same notes, different synth = different vibe. Try swapping the sound:
+d1 $ note "c2 ~ c2 [ds2 g2]" # sound "supersquare" # cutoff 800 # gain 0.9
+
+
+-- ------------------------------------------------------------
+-- 4. A pad / chord stab
+-- ------------------------------------------------------------
+-- `note "c'maj"` is chord shorthand — Tidal expands it to c+e+g.
+-- Try 'min, 'maj7, 'min7, 'sus4 too.
+d1 $ note "c'maj e'min g'maj a'min" # sound "superpwm"
+       # attack 0.3 # release 1 # cutoff 1500 # gain 0.8
+
+-- Slow it right down for an ambient bed:
+d1 $ slow 4 $ note "c'maj7 a'min7" # sound "superhammond" # room 0.4 # gain 0.7
+
+
+-- ------------------------------------------------------------
+-- 5. Put a synth over a beat
+-- ------------------------------------------------------------
+d1 $ sound "bd ~ bd [~ bd]"
+d2 $ sound "hh*8" # gain 0.7
+d3 $ note "c5 e5 g5 b5 a5 g5 e5 c5" # sound "superchip" # gain 0.85
+d4 $ note "<c2 g1 as1 f1>" # sound "superreese" # cutoff 900 # gain 0.95
+-- ^ d4: one bass note per cycle, cycling through 4 of them.
+
+-- Mutate the lead live while it plays:
+d3 $ jux rev $ note "c5 e5 g5 b5 a5 g5 e5 c5" # sound "superchip" # gain 0.85
+d3 $ every 4 (fast 2) $ note "c5 e5 g5 b5" # sound "superchip" # gain 0.85
+
+
+-- ------------------------------------------------------------
+-- 6. Stopping
+-- ------------------------------------------------------------
+d3 silence
+hush
+
+
+-- ============================================================
+-- CHEAT SHEET — synths by job:
+--   BASS    : superreese, supersquare, super808, supersaw(low)
+--   LEAD    : superchip, superpiano, supermandolin, superhoover
+--   PAD     : superpwm, superhammond, supersaw + long attack
+--   FX/HIT  : supernoise, superzow, supergong, superhat
+-- Knobs to remember: attack release cutoff resonance gain room
+-- ============================================================
