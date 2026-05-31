@@ -1,0 +1,18 @@
+setcps (120/60/2)   -- a calm 120 BPM to audition things
+-- setcps (60/60/2)   -- a calm 60 BPM to study things
+
+d1 $ sound "bd bd"
+
+
+d2 $ slowcat [
+    sound "~"
+    , sound "~"
+    , sound "cp"
+    , sound "~"
+    , sound "~"
+    , sound "hh*3 ~ hh ~"
+    , sound "hh ~ hh*2 ~"
+]
+
+d2 silence 
+
