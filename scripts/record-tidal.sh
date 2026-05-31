@@ -34,6 +34,9 @@
 #                        (default: $TIDAL_BOOT or tidal.nvim's bootfile)
 #       --port N         SuperDirt OSC port                   (default: 57120)
 #       --keep-raw       Also keep the untouched capture next to the output
+#       --also EXT       Also export a companion file in another format next to
+#                        the output, e.g. --also mp3  (mp3/ogg/flac/wav ...)
+#       --play           Play the rendered output when done (preview)
 #   -h, --help           Show this help
 #
 # Examples:
@@ -41,6 +44,8 @@
 #                           -o experiments/notifications/futuristic-major.wav
 #
 #   scripts/record-tidal.sh -i pad.tidal -o pad.mp3 --tail 8 --no-normalize --keep-raw
+#
+#   scripts/record-tidal.sh -i pad.tidal -o pad.wav --also mp3 --play
 #
 set -uo pipefail
 export LC_ALL=C   # force '.' as decimal separator for awk/ffmpeg
@@ -61,6 +66,8 @@ TP=-1.5
 GAIN=""
 NORMALIZE=1
 KEEP_RAW=0
+PLAY=0
+ALSO=""
 RATE=48000
 GHCI_BIN="${GHCI:-ghci}"
 CAPNAME="km-tidalrec"
@@ -87,6 +94,8 @@ while [[ $# -gt 0 ]]; do
     --boot)         BOOT="$2"; shift 2;;
     --port)         DIRT_PORT="$2"; shift 2;;
     --keep-raw)     KEEP_RAW=1; shift;;
+    --also)         ALSO="$2"; shift 2;;
+    --play)         PLAY=1; shift;;
     -h|--help)      usage;;
     *) die "unknown option: $1 (try --help)";;
   esac
@@ -243,6 +252,31 @@ if [[ $KEEP_RAW -eq 1 ]]; then
   say "kept raw capture -> $RAWOUT"
 fi
 
+# Optional companion export in another format (transcoded from the output).
+if [[ -n "$ALSO" ]]; then
+  ALSOOUT="${OUTPUT%.*}.${ALSO#.}"
+  case "${ALSO#.}" in
+    mp3)  ACODEC=(-c:a libmp3lame -q:a 2);;
+    ogg|oga) ACODEC=(-c:a libvorbis -q:a 5);;
+    flac) ACODEC=(-c:a flac);;
+    *)    ACODEC=();;   # let ffmpeg pick by extension
+  esac
+  if ffmpeg -hide_banner -loglevel error -y -i "$OUTPUT" "${ACODEC[@]}" "$ALSOOUT"; then
+    say "also wrote -> $ALSOOUT"
+  else
+    say "warning: companion export to '$ALSO' failed (skipped)"
+  fi
+fi
+
 say "done:"
 ffmpeg -hide_banner -nostats -i "$OUTPUT" -af volumedetect -f null - 2>&1 \
   | grep -E 'Duration|mean_volume|max_volume' | sed 's/^/    /' >&2
+
+# Optional preview playback.
+if [[ $PLAY -eq 1 ]]; then
+  say "playing preview ..."
+  if   command -v pw-play >/dev/null 2>&1; then pw-play "$OUTPUT"
+  elif command -v ffplay  >/dev/null 2>&1; then ffplay -hide_banner -loglevel error -autoexit -nodisp "$OUTPUT"
+  elif command -v paplay  >/dev/null 2>&1; then paplay "$OUTPUT"
+  else say "no player found (pw-play/ffplay/paplay) — skipping preview"; fi
+fi
